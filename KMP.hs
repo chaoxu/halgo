@@ -13,21 +13,15 @@ isNull (Null _ _) = True
 isNull _ = False
 
 buildAutomaton :: Eq a => [a] -> Automaton a
-buildAutomaton xs = automaton
-  where automaton = startBuild xs
-        startBuild (x:xs) = t 
-          where t = Node x (build xs automaton) (Null automaton False) (null xs)
-                build ys s -- s is: success (previous failure)
-                  | null ys      = s
-                  | x == value s = s          `nextNode` failure s
-                  | otherwise    = failure' s `nextNode` s
-                  where (x,xs)       = (head ys, tail ys)
-                        nextNode a b = Node x (build xs (success a)) b (null xs)
-                        failure' s
-                          | isNull s     = s 
-                          | x /= value s = failure' (failure s)
-                          | otherwise    = s
-
+buildAutomaton (x:xs) = automaton
+  where automaton = Node x (build xs automaton) (Null automaton False) (null xs)
+        build [] s = s
+        build (x:xs) s
+         | x == value s = success s `nextNode` failure s
+         | otherwise    = newS      `nextNode` s
+         where nextNode a b = Node x (build xs a) b (null xs)
+               newS         = success $ until (\s-> isNull s || x == value s) failure s
+                         
 matchFold :: Eq a => Automaton a -> [a] -> ([a]->b->b) -> ([a]->b->b) -> b -> b
 matchFold _ [] _ _ identity = identity
 matchFold state text nomat mat identity = match' state text
