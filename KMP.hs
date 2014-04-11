@@ -1,4 +1,4 @@
---import Data.List
+import Data.List
 --import Test.QuickCheck
 --import Data.Algorithms.KMP
 data Automaton a = Node {value   :: a,
