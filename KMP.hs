@@ -6,16 +6,17 @@ data Automaton a = Node {value   :: a,
                          failure :: Automaton a,
                          accept  :: Bool
                          } | 
-                   Null {success :: Automaton a}
+                   Null {success :: Automaton a,
+                         accept :: Bool}
 
-isNull (Null _) = True
+isNull (Null _ _) = True
 isNull _ = False
 
 buildAutomaton :: Eq a => [a] -> Automaton a
 buildAutomaton xs = automaton
   where automaton = startBuild xs
         startBuild (x:xs) = t 
-          where t = Node x (build xs automaton) (Null automaton) (null xs)
+          where t = Node x (build xs automaton) (Null automaton False) (null xs)
                 build ys s -- s is: success (previous failure)
                   | null ys      = s
                   | x == value s = s          `nextNode` failure s
@@ -33,9 +34,8 @@ matchFold state text nomat mat identity = match' state text
   where match' _ [] = identity
         match' a (x:xs)
           | not (isNull a) && value a /= x = stay
-          | isNull a                       = nomat (x:xs) next
-          | value a == x && accept a       = mat   (x:xs) next
-          | value a == x                   = nomat (x:xs) next
+          | not (accept a)                 = nomat (x:xs) next
+          | otherwise                      = mat   (x:xs) next
           where next = match' (success a) xs
                 stay = match' (failure a) (x:xs)
 
@@ -48,7 +48,7 @@ matchTails :: Eq a => [a] -> [a] -> [[a]]
 matchTails pattern text
  | null pattern = tails text
  | otherwise    = result
-  where result = map (pattern++) $ matchFold (buildAutomaton pattern) text (const id) (:) []
+  where result = map ((init pattern)++) $ matchFold (buildAutomaton pattern) text (const id) (:) []
 
 matchIndices :: Eq a => [a] -> [a] -> [Int]
 matchIndices pattern text 
