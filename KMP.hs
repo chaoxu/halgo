@@ -42,7 +42,7 @@ matchTails :: Eq a => [a] -> [a] -> [[a]]
 matchTails pattern text
  | null pattern = tails text
  | otherwise    = result
-  where result = map ((init pattern)++) $ matchFold (buildAutomaton pattern) text (const id) (:) []
+  where result = map (init pattern++) $ matchFold (buildAutomaton pattern) text (const id) (:) []
 
 matchIndices :: Eq a => [a] -> [a] -> [Int]
 matchIndices pattern text 
