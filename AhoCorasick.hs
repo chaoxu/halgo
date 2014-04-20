@@ -25,8 +25,7 @@ build trans' xs out = node
           | isNothing next = trans' a
           | otherwise      = fromJust next
           where next = lookup a table
-        equiv = equivalentClasses (on (==) (head . fst)) xs
-        table =  map transPair equiv
+        table =  map transPair $ equivalentClasses (on (==) (head . fst)) xs
         transPair xs = (a, build (delta (trans' a)) ys out)
          where a  = head $ fst $ head xs
                (ys,zs) = partition (not . null . fst) $ map (first tail) xs
