@@ -1,20 +1,14 @@
-module AhoCorasick ( Automaton(Node), buildAutomaton, match, isInfixOf) where
+module AhoCorasick ( Automaton(Node), buildAutomaton, match, match', isInfixOf) where
 import           Control.Arrow (first)
 import           Data.Function (on)
-import           Data.List     (lookup, partition)
-import           Data.Maybe    (fromMaybe, Maybe (..))
+import           Data.List     (partition)
+import           Data.Maybe    (fromMaybe)
 import           Data.Monoid   (All (..), Monoid, getAll, mappend, mconcat,
                                 mempty)
+import           Utils         (equivalentClasses)
 data Automaton a b = Node {delta  :: a -> Automaton a b,
                            output :: b
                          }
-
-equivalentClasses :: (a->a->Bool)->[a]->[[a]]
-equivalentClasses eq = foldl parts []
-  where parts [] a = [[a]]
-        parts (x:xs) a
-         | eq (head x) a = (a:x):xs
-         | otherwise     = x:parts xs a
 
 buildAutomaton :: (Monoid b,Eq a) => [([a],b)] -> Automaton a b
 buildAutomaton xs = automaton
