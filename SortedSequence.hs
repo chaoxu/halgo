@@ -8,9 +8,6 @@ import           Data.FingerTree (FingerTree, Measured (..), ViewL (..), empty,
 import qualified Data.FingerTree as F (null, split)
 import           Data.Monoid     (Monoid (..))
 
--- this implements a sorted sequence with finger tree
--- it allow
-
 data MeasuredOrd a = Min | MeasuredOrd a deriving (Eq, Ord, Show)
 
 instance Ord a => Monoid (MeasuredOrd a) where
